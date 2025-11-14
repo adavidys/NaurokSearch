@@ -1,0 +1,9 @@
+FROM python:3.14.0-alpine
+WORKDIR /app
+COPY requaremets.txt .
+RUN pip install --no-cache-dir -r requaremets.txt
+COPY sutup.py .
+RUN python sutup.py
+ENTRYPOINT ["python", "src/main"]
+
+# is file not a tested
