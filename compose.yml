@@ -1,0 +1,5 @@
+services:
+  naurok:
+    build: ./app
+    image: naurok
+    

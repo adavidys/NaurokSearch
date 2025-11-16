@@ -209,8 +209,5 @@ __marimo__/
 
 
 #-----------------------------------------------------------------------------------------------------------------------
-# cookies
-user_data
-
-# update requaremets.txt and utils
-pre-commit.ps1
+# start dev command
+start.ps1
