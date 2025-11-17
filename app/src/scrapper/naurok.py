@@ -72,7 +72,7 @@ class Naurok:
         return result
     
     @staticmethod
-    async def test_info(session: aiohttp.ClientSession, href: str):
+    async def test_info(session: aiohttp.ClientSession, href: str) -> TestInfo:
         async with session.get(href) as req:
             soup = bs4lxml(await req.text())
         
@@ -103,7 +103,7 @@ class Naurok:
             options: list[Options] = []
             for option in item.select(".question-options > div"):
                 opt_text_ = option.select_one(".option-text > p")
-                opt_text = str(opt_text_ if opt_text_ else "")
+                opt_text = str(opt_text_) if opt_text_ else None
                  
                 opt_img  = option.select_one("img")
                 opt_img_href = None
@@ -112,13 +112,14 @@ class Naurok:
                 
                 options.append(Options(
                     text=opt_text,
-                    img_href=opt_img_href
+                    img=opt_img_href,
+                    correctness=None
                 ))
             
             questions.append(Question(
                 type=type,
                 text=text,
-                img_href=img_href,
+                img=img_href,
                 options=options
             ))
         
@@ -131,13 +132,65 @@ class Naurok:
             questions=questions
         )
 
+    @staticmethod
+    async def completed_test_info(session: aiohttp.ClientSession, href: str):
+        async with session.get(href) as req:
+            soup = bs4lxml(await req.text())
+        
+        name_test = soup.select_one(".homework-personal-stat-test").text
+        number_questions = int("".join(filter(lambda x: x.isdigit(), soup.select_one(".homework-personal-stat-number").text)))
+        
+        questions: list[Question] = []
+        for item in soup.select(".homework-stats > .content-block .homework-stat-question-line"):
+            type = item.select_one(".homework-stat-option-value > span")["class"][1]
+            
+            text = "".join(map(lambda x: str(x), item.select(".homework-stat-question-line > p")))
+            
+            img = item.select_one(".col-md-6 > img")
+            img_href = None
+            if img:
+                img_href = img.get("src")
+                
+            
+            options: list[Options] = []
+            for opt in item.select(".homework-stat-option-line .homework-stat-option-value"):
+                opt_text = "".join(map(lambda x: str(x), opt.select("p")))
 
+                opt_img = opt.select_one(".homework-stat-option-value > img")
+                opt_img_href = None
+                if opt_img:
+                    opt_img_href = opt_img.get("src")
+
+                options.append(Options(
+                    text=opt_text,
+                    img=opt_img_href,
+                    correctness=opt.select_one("span")["class"][0] == "correct",
+                ))
+
+            questions.append(Question(
+                type=type,
+                text=text,
+                img=img_href,
+                options=options
+            ))
+            
+            
+        return TestInfo(
+            name=name_test,
+            number_questions=number_questions,
+            href=(lambda u: u if "://" not in u else urlparse(u).path)(href),
+            klas=0,
+            subject="",
+            questions=questions
+        )
+    
+    
 async def __test():
     async with Naurok.create_session() as ses:
-        data = await Naurok.test_info(ses, "/test/pidsumkovi-testi-z-istori-ukra-ni-za-programoyu-zno-2351141.html")
-
-        with open("output.json", "w", encoding="utf-8") as file:
-            file.write(data.model_dump_json(indent=4, ensure_ascii=False))
+        data = await Naurok.completed_test_info(ses, "https://naurok.com.ua/test/complete/a7b56b11-7cc8-43e9-8326-1012e54bf346")
+        print(data.model_dump_json(indent=4, ensure_ascii=False))
+        # with open("output.json", "w", encoding="utf-8") as file:
+        #     file.write(data.model_dump_json(indent=4, ensure_ascii=False))
 
 if __name__ == "__main__":
     asyncio.run(__test())

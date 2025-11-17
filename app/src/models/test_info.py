@@ -64,24 +64,22 @@ class BaseTestInfo(BaseModel):
         value = value.strip()
         return SUBJECT_CONVERTOR.get(value, value)
 
-    @field_validator("name", mode="before")
-    def _name(cls, value: str):
-        return value.strip()
-
-class Options(BaseModel):
+class _BaseQuestion(BaseModel):
     text: str | None
-    img_href: str | None
+    img: str | None
     
     @field_validator("text", mode="before")
     def _text(cls, value: str | None):
         if value is None:
             return ""
         return value.strip()
-    
-class Question(Options):
+
+class Options(_BaseQuestion):
+    correctness: bool | None
+
+class Question(_BaseQuestion):
     type: Literal["quiz", "multiquiz"]
     options: list[Options]
-    
     
 class TestInfo(BaseTestInfo):
     questions: list[Question]
