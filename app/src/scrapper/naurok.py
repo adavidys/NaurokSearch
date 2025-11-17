@@ -11,7 +11,7 @@ from src.utils.alias import SUBJECT_LITERAL, KLAS_LITERAL
 from src.models.test_info import BaseTestInfo, TestInfo, Question, Options
 
 
-class Naurok:    
+class Naurok:
     @staticmethod
     def create_session() -> aiohttp.ClientSession:
         return aiohttp.ClientSession(
@@ -95,7 +95,7 @@ class Naurok:
             
             text = "".join(map(lambda x: str(x), item.select(".question-view-item-content p")))
 
-            img = item.select_one("img")
+            img = item.select_one("img.question-view-item-image")
             img_href = None
             if img:
                 img_href = img.get("src")
@@ -156,7 +156,7 @@ class Naurok:
             for opt in item.select(".homework-stat-option-line .homework-stat-option-value"):
                 opt_text = "".join(map(lambda x: str(x), opt.select("p")))
 
-                opt_img = opt.select_one(".homework-stat-option-value > img")
+                opt_img = opt.select_one("img")
                 opt_img_href = None
                 if opt_img:
                     opt_img_href = opt_img.get("src")
