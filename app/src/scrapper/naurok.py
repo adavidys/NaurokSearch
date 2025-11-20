@@ -5,10 +5,10 @@ from urllib.parse import urlparse
 
 from src.config import COOKIES, HEADERS
 
-from src.utils.alias import bs4lxml
-from src.utils.alias import SUBJECT_LITERAL, KLAS_LITERAL
+from src.scrapper.utils.alias import bs4lxml
+from src.scrapper.utils.alias import SUBJECT_LITERAL, KLAS_LITERAL
 
-from src.models.test_info import BaseTestInfo, TestInfo, Question, Options
+from src.scrapper.schema.test_info import BaseTestInfo, TestInfo, Question, Options
 
 
 class Naurok:

@@ -1,7 +1,7 @@
 from typing import Literal
 from pydantic import BaseModel, field_validator
 
-from src.utils.alias import SUBJECT_LITERAL, KLAS_LITERAL
+from src.scrapper.utils.alias import SUBJECT_LITERAL, KLAS_LITERAL
 
 
 SUBJECT_CONVERTOR = {
