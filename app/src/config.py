@@ -1,13 +1,16 @@
+import os
+import dotenv
+
 from pathlib import Path
 
-from fake_useragent import UserAgent
+
+dotenv.load_dotenv()
 
 
 DEBUG = True
 
 BASE_DIR = Path()
 
-
-HEADERS = {"user-agent": UserAgent().random}
-COOKIES = {}
+POSTGRES_USER = os.environ["POSTGRES_USER"]
+POSTGRES_PASSWORD = os.environ["POSTGRES_PASSWORD"]
 

@@ -3,22 +3,28 @@ import aiohttp
 
 from urllib.parse import urlparse
 
-from src.config import COOKIES, HEADERS
-
+from src.scrapper.utils.sender import RequestClass, ResponseClass
 from src.scrapper.utils.alias import bs4lxml
 from src.scrapper.utils.alias import SUBJECT_LITERAL, KLAS_LITERAL
 
 from src.scrapper.schema.test_info import BaseTestInfo, TestInfo, Question, Options
 
-
 class Naurok:
-    @staticmethod
-    def create_session() -> aiohttp.ClientSession:
+    BASE_URL = "https://naurok.com.ua"
+    
+    @classmethod
+    def create_session(cls,
+        headers: dict[str, str]=dict(),
+        cookies: dict[str, str]=dict()
+    ) -> aiohttp.ClientSession:
         return aiohttp.ClientSession(
-            base_url="https://naurok.com.ua",
-            headers=HEADERS,
-            cookies=COOKIES
-        )  
+            base_url=cls.BASE_URL,
+            headers=headers,
+            cookies=cookies,
+            
+            request_class=RequestClass,
+            response_class=ResponseClass
+        )
     
     @staticmethod
     async def search(
@@ -183,14 +189,12 @@ class Naurok:
             subject="",
             questions=questions
         )
-    
-    
+
+        
 async def __test():
     async with Naurok.create_session() as ses:
-        data = await Naurok.completed_test_info(ses, "https://naurok.com.ua/test/complete/a7b56b11-7cc8-43e9-8326-1012e54bf346")
-        print(data.model_dump_json(indent=4, ensure_ascii=False))
-        # with open("output.json", "w", encoding="utf-8") as file:
-        #     file.write(data.model_dump_json(indent=4, ensure_ascii=False))
+        await Naurok.completed_test_info(ses, "https://naurok.com.ua/test/complete/a7b56b11-7cc8-43e9-8326-1012e54bf346")
+        await Naurok.completed_test_info(ses, "https://naurok.com.ua/test/complete/a7b56b11-7cc8-43e9-8326-1012e54bf346")
 
 if __name__ == "__main__":
     asyncio.run(__test())
